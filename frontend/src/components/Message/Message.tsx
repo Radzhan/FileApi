@@ -1,7 +1,6 @@
 import { Alert, AlertTitle } from '@mui/material';
 import dayjs from 'dayjs';
 import React from 'react';
-import '../../App.css';
 
 interface Props {
     message: string;

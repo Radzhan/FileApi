@@ -1,14 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Button, TextField } from '@mui/material';
-import './App.css';
 import Message from './components/Message/Message';
 import { arrayWithMessages } from './types';
+import axiosApi from './axiosApi';
 let lastDate = '';
 
 function App() {
   const [messages, setMessages] = useState<arrayWithMessages[]>([]);
-
-  const url = 'http://localhost:8000/messages';
 
   let message: string;
 
@@ -16,54 +14,49 @@ function App() {
 
   const setMessage = async () => {
     if (message !== undefined && author !== undefined) {
-      const data = new URLSearchParams();
-
-      data.set('message', message);
-      data.set('author', author);
-
-      await fetch(url, {
-        method: 'post',
-        body: data,
-      });
+      const onjectForPost = {
+        message,
+        author,
+      };
+      await axiosApi.post('messages', onjectForPost);
     }
   }
 
   useEffect(() => {
     setInterval(async () => {
-
       if (lastDate === '') {
-        const response = await fetch(url);
-        const answer: arrayWithMessages[] = await response.json();
-        for (let i = 0; i < answer.length; i++) {
-          setMessages(prev => [...prev, { message: answer[i].message, _id: answer[i]._id, author: answer[i].author, datetime: answer[i].datetime }]);
-          lastDate = answer[i].datetime;
+        const responseApi = await axiosApi.get('messages');
+        const response: arrayWithMessages[] = responseApi.data;
+        for (let i = 0; i < response.length; i++) {
+          setMessages(prev => [...prev, { message: response[i].message, _id: response[i]._id, author: response[i].author, datetime: response[i].datetime }]);
+          lastDate = response[i].datetime;
         }
       } else {
-        const lastUrl = 'http://localhost:8000/messages?datetime=' + lastDate;
+        const answerFromUrlApi = await axiosApi.get('messages?datetime=' + lastDate);
+        const answerFromUrl: arrayWithMessages[] = answerFromUrlApi.data;
 
-        const answerFromUrl = await fetch(lastUrl);
-        const answerFromUrlArr: arrayWithMessages[] = await answerFromUrl.json();
-
-        if (answerFromUrlArr.length !== 0) {
-          for (let i = 0; i < answerFromUrlArr.length; i++) {
-            setMessages(prev => [...prev, { message: answerFromUrlArr[i].message, _id: answerFromUrlArr[i]._id, author: answerFromUrlArr[i].author, datetime: answerFromUrlArr[i].datetime }]);
-            lastDate = answerFromUrlArr[i].datetime;
+        if (answerFromUrl.length !== 0) {
+          for (let i = 0; i < answerFromUrl.length; i++) {
+            setMessages(prev => [...prev, { message: answerFromUrl[i].message, _id: answerFromUrl[i]._id, author: answerFromUrl[i].author, datetime: answerFromUrl[i].datetime }]);
+            lastDate = answerFromUrl[i].datetime;
           }
         }
       }
-
     }, 3000)
   }, [])
 
+  let onFormSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setMessage();
+  };
+
   let createMessage = messages.map(message => (
     <Message key={message._id} date={message.datetime} message={message.message} author={message.author} />
-  ))
+  ));
 
   return (
     <div className="App">
-      <form onSubmit={e => {
-        e.preventDefault()
-      }}>
+      <form onSubmit={onFormSubmit}>
         <TextField id="outlined-basic" label="Enter message" onChange={(e) => {
           message = e.target.value
         }} required variant="outlined" />
@@ -71,7 +64,7 @@ function App() {
         <TextField id="outlined-basic" label="Enter your name" onChange={e => {
           author = e.target.value
         }} required variant="outlined" />
-        <Button variant="contained" type='submit' onClick={setMessage}>Sande</Button>
+        <Button variant="contained" type='submit'>Sande</Button>
       </form>
       {createMessage}
     </div>
