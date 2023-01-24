@@ -8,14 +8,14 @@ const port = 8000;
 
 app.use(cors());
 app.use(express.json());
-app.use('/messages', messageRouter)
+app.use('/messages', messageRouter);
 
 const run = async () => {
     await fileDb.init();
     
     app.listen(port, () => {
         console.log('we are live on ' + port);
-    })
+    });
 };
 
 run().catch(console.error)

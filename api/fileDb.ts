@@ -21,7 +21,7 @@ const fileDb = {
   },
 
   async addItem(item: ApiWithOutIdAndDate) {
-    const date = new Date
+    const date = new Date;
     const _id = randomUUID();
 
     const message = {

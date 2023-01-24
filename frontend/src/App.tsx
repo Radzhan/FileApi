@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Button, TextField } from '@mui/material';
 import './App.css';
 import Message from './components/Message/Message';
 import { arrayWithMessages } from './types';
@@ -55,7 +56,7 @@ function App() {
   }, [])
 
   let createMessage = messages.map(message => (
-    <Message key={message._id} message={message.message} author={message.author} />
+    <Message key={message._id} date={message.datetime} message={message.message} author={message.author} />
   ))
 
   return (
@@ -63,13 +64,14 @@ function App() {
       <form onSubmit={e => {
         e.preventDefault()
       }}>
-        <input type="text" placeholder='Enter message' onChange={(e) => {
+        <TextField id="outlined-basic" label="Enter message" onChange={(e) => {
           message = e.target.value
-        }} required />
-        <input type="text" placeholder='Enter your name' onChange={e => {
+        }} required variant="outlined" />
+
+        <TextField id="outlined-basic" label="Enter your name" onChange={e => {
           author = e.target.value
-        }} required />
-        <button type='submit' onClick={setMessage}>Sande</button>
+        }} required variant="outlined" />
+        <Button variant="contained" type='submit' onClick={setMessage}>Sande</Button>
       </form>
       {createMessage}
     </div>

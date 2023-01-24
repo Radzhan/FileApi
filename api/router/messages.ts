@@ -6,15 +6,15 @@ const messageRouter = express.Router();
 
 messageRouter.post('/', async (req , res) => {
     if (!req.body.message || !req.body.author){
-        return res.status(400).send({error: 'Author and message must be present in the request'})
+        return res.status(400).send({error: 'Author and message must be present in the request'});
     }
     const messageData: ApiWithOutIdAndDate  =  {
         message: req.body.message,
         author: req.body.author,
-    }
+    };
 
-    const savedMessage = await fileDb.addItem(messageData)
-    res.send(savedMessage)
+    const savedMessage = await fileDb.addItem(messageData);
+    res.send(savedMessage);
 });
 
 messageRouter.get('/', async (req, res) => {
@@ -37,7 +37,7 @@ messageRouter.get('/', async (req, res) => {
         return res.send(array);
     } 
     if (isDate) {
-        return res.status(400).send({error: 'Invalid datetime'})
+        return res.status(400).send({error: 'Invalid datetime'});
     }  
 })
 
